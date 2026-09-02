@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>你的能量场，属于哪一种天气？</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ===== 欢迎页 ===== -->
+  <section id="page-welcome" class="page active">
+    <div class="bg-flow" data-theme="sunrise"></div>
+    <div class="welcome-inner">
+      <div class="welcome-badge">✨ 能量气象观测站</div>
+      <h1 class="welcome-title">你的能量场<br>属于哪一种天气？</h1>
+      <p class="welcome-sub">有些人靠近时像晴天，有些人安静如冬雪。<br>你的能量场，正在以什么天气运转？</p>
+      <div class="welcome-meta">24 道题 · 约 3 分钟 · 测出你的专属天气能量</div>
+      <button class="btn btn-primary" id="btn-start">开始探索</button>
+      <p class="welcome-tip">☁️ 凭直觉选择，结果更贴近真实的你</p>
+    </div>
+  </section>
+
+  <!-- ===== 答题页 ===== -->
+  <section id="page-quiz" class="page">
+    <div class="quiz-top">
+      <div class="quiz-progress-text"><span id="q-current">1</span> / <span id="q-total">24</span></div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+    <div class="quiz-body">
+      <h2 class="quiz-question" id="q-text">题目加载中…</h2>
+      <div class="option-list" id="option-list"></div>
+      <div class="quiz-nav">
+        <button class="btn btn-ghost" id="btn-prev" disabled>上一题</button>
+        <button class="btn btn-primary" id="btn-next">下一题</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 结果生成动效页 ===== -->
+  <section id="page-loading" class="page">
+    <div class="bg-flow" data-theme="aurora"></div>
+    <div class="loading-inner">
+      <div class="weather-orb" id="loading-orb">🌥</div>
+      <h2 class="loading-title">正在读取你的能量场…</h2>
+      <div class="loading-steps">
+        <p class="loading-line" id="load-line-1">观测云层流向…</p>
+        <p class="loading-line" id="load-line-2">感应温度变化…</p>
+        <p class="loading-line" id="load-line-3">凝结你的专属天气…</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 结果页 ===== -->
+  <section id="page-result" class="page">
+    <div class="bg-flow" id="result-bg"></div>
+    <div class="result-inner">
+      <div class="result-hero">
+        <div class="result-icon" id="r-icon">☀️</div>
+        <div class="result-type" id="r-type">晨光初绽 · 向阳型</div>
+        <div class="result-slogan" id="r-slogan">靠近你，世界总会亮一点</div>
+        <div class="result-tags" id="r-tags"></div>
+      </div>
+
+      <div class="result-archive">
+        <div class="archive-block">
+          <div class="archive-title">🌱 性格底色</div>
+          <p class="archive-text" id="r-base"></p>
+        </div>
+        <div class="archive-block">
+          <div class="archive-title">✨ 你最擅长的事</div>
+          <p class="archive-text" id="r-good"></p>
+        </div>
+        <div class="archive-block">
+          <div class="archive-title">🌫 别人常误解你的点</div>
+          <p class="archive-text" id="r-misunderstood"></p>
+        </div>
+        <div class="archive-block">
+          <div class="archive-title">🤝 与你舒服相处的法则</div>
+          <p class="archive-text" id="r-company"></p>
+        </div>
+        <div class="archive-block">
+          <div class="archive-title">🔋 你的"好天气"充电指南</div>
+          <p class="archive-text" id="r-charge"></p>
+        </div>
+        <div class="archive-block highlight">
+          <div class="archive-title">✍️ 属于你的天气短句</div>
+          <p class="archive-quote" id="r-quote"></p>
+        </div>
+      </div>
+
+      <div class="result-share">
+        <button class="btn btn-share" id="btn-copy">📋 复制我的结果，发个小红书</button>
+        <button class="btn btn-ghost" id="btn-again">再测一次</button>
+      </div>
+      <p class="result-foot">每个人心里都住着一种天气<br>而你的，刚好值得被看见 ☁️</p>
+    </div>
+  </section>
+
+  <div id="toast" class="toast">已复制 ✨</div>
+
+  <script src="js/questions.js"></script>
+  <script src="js/results.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

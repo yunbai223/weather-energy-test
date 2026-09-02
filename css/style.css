@@ -1,0 +1,545 @@
+/* =====================================================
+   你的能量场 · 属于哪一种天气？
+   移动端优先 · 小红书氛围审美
+   ===================================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+  --ink: #2b2b33;
+  --ink-soft: #6b6b78;
+  --ink-faint: #9a9aa6;
+  --card: rgba(255, 255, 255, 0.78);
+  --card-border: rgba(255, 255, 255, 0.6);
+  --radius-lg: 24px;
+  --radius-md: 16px;
+  --shadow: 0 12px 40px rgba(40, 40, 70, 0.10);
+  --accent: #7c6cf0;
+  --accent-deep: #5b4bd6;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: #f4f1fa;
+  color: var(--ink);
+  overflow-x: hidden;
+}
+
+/* ---------- 页面切换 ---------- */
+.page {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s;
+  z-index: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.page.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  z-index: 10;
+}
+
+/* ---------- 流动渐变背景 ---------- */
+.bg-flow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  transition: background 1.2s ease;
+  animation: bgBreath 12s ease-in-out infinite alternate;
+}
+
+@keyframes bgBreath {
+  0%   { filter: hue-rotate(0deg) brightness(1); }
+  100% { filter: hue-rotate(12deg) brightness(1.05); }
+}
+
+.bg-flow[data-theme="sunrise"] {
+  background: linear-gradient(160deg, #ffd3a5 0%, #fd9f7a 45%, #f6a6c1 100%);
+}
+.bg-flow[data-theme="aurora"] {
+  background: linear-gradient(160deg, #1a1a3e 0%, #3b2d6e 50%, #1a1a3e 100%);
+}
+.bg-flow[data-theme="day"] {
+  background: linear-gradient(160deg, #8ec5fc 0%, #e0c3fc 100%);
+}
+.bg-flow[data-theme="noon"] {
+  background: linear-gradient(160deg, #4facfe 0%, #00f2fe 100%);
+}
+.bg-flow[data-theme="golden"] {
+  background: linear-gradient(160deg, #f6d365 0%, #fda085 100%);
+}
+.bg-flow[data-theme="clear"] {
+  background: linear-gradient(160deg, #a1c4fd 0%, #c2e9fb 100%);
+}
+.bg-flow[data-theme="firefly"] {
+  background: linear-gradient(160deg, #0f2027 0%, #203a43 55%, #2c5364 100%);
+}
+.bg-flow[data-theme="breeze"] {
+  background: linear-gradient(160deg, #d4fc79 0%, #96e6a1 45%, #76b2fe 100%);
+}
+.bg-flow[data-theme="mist"] {
+  background: linear-gradient(160deg, #e6e9f0 0%, #c3cfe2 100%);
+}
+.bg-flow[data-theme="storm"] {
+  background: linear-gradient(160deg, #4b4b6e 0%, #2d2d44 60%, #1f1f30 100%);
+}
+.bg-flow[data-theme="aurora2"] {
+  background: linear-gradient(160deg, #0f0c29 0%, #302b63 55%, #24243e 100%);
+}
+.bg-flow[data-theme="snow"] {
+  background: linear-gradient(160deg, #e0eafc 0%, #cfdef3 100%);
+}
+
+/* 页面内容不参与滚动时的居中兜底 */
+.page.active > .welcome-inner,
+.page.active > .quiz-body,
+.page.active > .loading-inner,
+.page.active > .result-inner {
+  margin: auto;
+}
+
+/* ---------- 通用按钮 ---------- */
+.btn {
+  display: block;
+  width: 100%;
+  padding: 16px 24px;
+  border: none;
+  border-radius: 999px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #8b7bf7, #6c5ce7);
+  color: #fff;
+  box-shadow: 0 10px 26px rgba(108, 92, 231, 0.35);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 12px 30px rgba(108, 92, 231, 0.45);
+}
+
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--ink);
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* ---------- 欢迎页 ---------- */
+.welcome-inner {
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  animation: fadeUp 0.8s ease both;
+}
+
+.welcome-badge {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(10px);
+  font-size: 13px;
+  font-weight: 600;
+  color: #5a4a8a;
+  letter-spacing: 2px;
+  margin-bottom: 26px;
+}
+
+.welcome-title {
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow: 0 4px 24px rgba(90, 60, 120, 0.25);
+  margin-bottom: 18px;
+}
+
+.welcome-sub {
+  font-size: 15px;
+  line-height: 1.9;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 6px rgba(90, 60, 120, 0.2);
+  margin-bottom: 26px;
+}
+
+.welcome-meta {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(6px);
+  border-radius: 999px;
+  padding: 10px 18px;
+  display: inline-block;
+  margin-bottom: 28px;
+}
+
+.welcome-inner .btn-primary {
+  margin-bottom: 18px;
+}
+
+.welcome-tip {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ---------- 答题页 ---------- */
+#page-quiz {
+  display: block;
+  padding: 0;
+}
+
+.quiz-top {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: 22px 24px 12px;
+  background: linear-gradient(180deg, #f4f1fa 0%, rgba(244, 241, 250, 0.85) 70%, transparent 100%);
+  backdrop-filter: blur(6px);
+}
+
+.quiz-progress-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.progress-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(108, 92, 231, 0.14);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #8b7bf7, #fda085);
+  transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.quiz-body {
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 90px);
+}
+
+.quiz-question {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.6;
+  margin-bottom: 26px;
+  animation: fadeUp 0.4s ease both;
+}
+
+.option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 30px;
+}
+
+.option-card {
+  padding: 18px 20px;
+  border-radius: var(--radius-md);
+  background: var(--card);
+  border: 1.5px solid var(--card-border);
+  box-shadow: 0 4px 16px rgba(40, 40, 70, 0.06);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  animation: fadeUp 0.45s ease both;
+}
+
+.option-card:active {
+  transform: scale(0.98);
+}
+
+.option-card.selected {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, rgba(139, 123, 247, 0.12), rgba(108, 92, 231, 0.08));
+  box-shadow: 0 6px 22px rgba(108, 92, 231, 0.18);
+}
+
+.quiz-nav {
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.quiz-nav .btn {
+  flex: 1;
+  padding: 14px 18px;
+  font-size: 15px;
+}
+
+/* ---------- 加载动效页 ---------- */
+.loading-inner {
+  text-align: center;
+  max-width: 420px;
+}
+
+.weather-orb {
+  width: 130px;
+  height: 130px;
+  margin: 0 auto 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.9), rgba(255,255,255,0.25) 45%, rgba(255,255,255,0.05) 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60px;
+  box-shadow: 0 0 60px rgba(255, 255, 255, 0.35), inset 0 0 30px rgba(255,255,255,0.3);
+  animation: orbFloat 2.4s ease-in-out infinite;
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-12px) scale(1.04); }
+}
+
+.loading-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 28px;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 14px rgba(0,0,0,0.2);
+}
+
+.loading-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.loading-line {
+  font-size: 14px;
+  color: rgba(255,255,255,0.75);
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.loading-line.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ---------- 结果页 ---------- */
+#page-result {
+  display: block;
+  padding: 0;
+}
+
+.result-inner {
+  max-width: 520px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 22px 48px;
+}
+
+.result-hero {
+  text-align: center;
+  padding: 36px 18px 30px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
+  margin-bottom: 22px;
+  animation: fadeUp 0.6s ease both;
+}
+
+.result-icon {
+  font-size: 64px;
+  margin-bottom: 14px;
+  animation: orbFloat 3s ease-in-out infinite;
+}
+
+.result-type {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.result-slogan {
+  font-size: 15px;
+  color: var(--ink-soft);
+  margin-bottom: 18px;
+  line-height: 1.7;
+}
+
+.result-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.result-tags .tag {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(108, 92, 231, 0.1);
+  color: var(--accent-deep);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.result-archive {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.archive-block {
+  padding: 20px 20px;
+  border-radius: var(--radius-md);
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 6px 20px rgba(40, 40, 70, 0.06);
+  animation: fadeUp 0.6s ease both;
+}
+
+.archive-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--accent-deep);
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.archive-text {
+  font-size: 15px;
+  line-height: 1.85;
+  color: var(--ink);
+}
+
+.archive-block.highlight {
+  background: linear-gradient(135deg, rgba(139, 123, 247, 0.14), rgba(253, 160, 133, 0.14));
+  border-color: rgba(108, 92, 231, 0.25);
+}
+
+.archive-quote {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.9;
+  color: var(--ink);
+  font-style: italic;
+}
+
+.result-share {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.btn-share {
+  background: linear-gradient(135deg, #ff5f6d, #ffc371);
+  color: #fff;
+  box-shadow: 0 10px 26px rgba(255, 95, 109, 0.3);
+}
+
+.result-foot {
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--ink-faint);
+}
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 60px;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(40, 40, 60, 0.9);
+  color: #fff;
+  padding: 12px 26px;
+  border-radius: 999px;
+  font-size: 14px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+  z-index: 99;
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ---------- 通用动效 ---------- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 答题区切换动画 */
+.quiz-question.anim-in {
+  animation: fadeUp 0.4s ease both;
+}
+
+.option-card.anim-in {
+  animation: fadeUp 0.45s ease both;
+}
+
+/* ---------- 桌面端微调 ---------- */
+@media (min-width: 768px) {
+  .welcome-title {
+    font-size: 44px;
+  }
+  .quiz-question {
+    font-size: 24px;
+  }
+  .result-type {
+    font-size: 30px;
+  }
+}
